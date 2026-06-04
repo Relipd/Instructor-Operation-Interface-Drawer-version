@@ -1,0 +1,22 @@
+{
+  "manifest_version": 1,
+  "name": "指导员处理操作平台",
+  "description": "指导员专属的异常处理任务台，横向抽屉式布局，支持按处理人筛选待处理/待反馈任务、一键确认核查、提交反馈与整改措施、实时更新处理状态",
+  "i18n": {
+    "zh": {
+      "name": "指导员处理操作平台",
+      "description": "指导员专属的异常处理任务台，横向抽屉式布局，支持按处理人筛选待处理/待反馈任务、一键确认核查、提交反馈与整改措施、实时更新处理状态"
+    },
+    "en": {
+      "name": "Operator Exception Task Console",
+      "description": "Dedicated exception task console for operators with horizontal drawer layout: filter pending/pending-feedback tasks by handler, one-click check confirmation, submit feedback and corrective measures, real-time status updates"
+    },
+    "ja": {
+      "name": "オペレーター異常タスクコンソール",
+      "description": "オペレーター向け異常処理タスクコンソール（横型ドローレイアウト）：担当者による未処理/フィードバック待ちタスクのフィルター、ワンクリック確認チェック、フィードバックと是正措置の送信、リアルタイムステータス更新"
+    }
+  },
+  "version": "1.0.0",
+  "icon": "📋",
+  "entry": "./dist/index.html"
+}
