@@ -1,0 +1,175 @@
+import {
+  Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription,
+} from '@/components/ui/sheet'
+import { Separator } from '@/components/ui/separator'
+import { Button } from '@/components/ui/button'
+import { StatusBadge } from '@/components/StatusBadge'
+import { RiskBadge } from '@/components/RiskBadge'
+import type { ExceptionRecord, ActionType } from '@/types'
+
+interface DetailDrawerProps {
+  record: ExceptionRecord | null
+  open: boolean
+  onOpenChange: (open: boolean) => void
+  onAction?: (action: ActionType, record: ExceptionRecord) => void
+}
+
+function FieldRow({ label, value }: { label: string; value: string | number }) {
+  if (!value && value !== 0) return null
+  return (
+    <div className="space-y-0.5">
+      <p className="text-xs text-[#8f959e]">{label}</p>
+      <p className="text-sm text-[#1f2329]">{value}</p>
+    </div>
+  )
+}
+
+export function DetailDrawer({ record, open, onOpenChange, onAction }: DetailDrawerProps) {
+  const extFields = record ? [
+    { label: '店铺名称', value: record.extStoreName },
+    { label: '用户手机号', value: record.extUserPhone },
+    { label: '账号名', value: record.extAccountName },
+    { label: '用户姓名', value: record.extUserName },
+    { label: '用户角色列表', value: record.extUserRoleList },
+  ] : []
+
+  return (
+    <Sheet open={open} onOpenChange={onOpenChange}>
+      <SheetContent className="sm:max-w-none w-[640px] overflow-y-auto">
+        {!record ? null : (
+          <>
+        <SheetHeader>
+          <div className="flex items-center gap-3">
+            <SheetTitle className="text-lg">{record.exceptionType || '-'}</SheetTitle>
+            <RiskBadge level={(record.riskLevel as 'R1' | 'R2' | 'R3') || 'R1'} />
+            <StatusBadge status={record.status} />
+          </div>
+          <SheetDescription>
+            {record.exceptionCode || '-'}
+          </SheetDescription>
+        </SheetHeader>
+
+        <Separator className="my-4" />
+
+        {/* 基本信息 */}
+        <div className="space-y-3">
+          <h4 className="text-sm font-medium text-[#1f2329] pb-1 border-b border-[#e5e6eb]">基本信息</h4>
+          <div className="grid grid-cols-2 gap-x-6 gap-y-3">
+            <FieldRow label="来源平台" value={record.sourcePlatform} />
+            <FieldRow label="风险等级" value={record.riskLevel} />
+            <FieldRow label="处理人" value={record.handler} />
+            <FieldRow label="当前状态" value={record.status === '已完结' && record.riskAction ? `已完结（${record.riskAction}）` : record.status} />
+            <FieldRow label="处理时效" value={record.deadlineText || record.processDeadline} />
+            <FieldRow label="所属部门" value={record.department} />
+            <FieldRow label="账号分类" value={record.isCustomerService} />
+            <FieldRow label="店铺管理员" value={record.storeManagers} />
+            <FieldRow label="审阅时间" value={record.reviewTime || record.createdAt} />
+            <FieldRow label="通知时间" value={record.noticeTime} />
+          </div>
+        </div>
+
+        {/* 异常描述 */}
+        {record.description && (
+          <>
+            <Separator className="my-4" />
+            <div className="space-y-2">
+              <h4 className="text-sm font-medium text-[#1f2329]">异常描述</h4>
+              <div className="rounded-lg bg-[#f5f6f8] p-3">
+                <p className="text-sm text-[#646a73]">{record.description}</p>
+              </div>
+            </div>
+          </>
+        )}
+
+        {/* 反馈内容 */}
+        {record.feedback && (
+          <>
+            <Separator className="my-4" />
+            <div className="space-y-2">
+              <h4 className="text-sm font-medium text-[#1f2329]">反馈内容</h4>
+              <div className="rounded-lg bg-[#f5f6f8] p-3">
+                <p className="text-sm text-[#646a73] whitespace-pre-wrap">{record.feedback}</p>
+              </div>
+            </div>
+          </>
+        )}
+
+        {/* 整改反馈内容 */}
+        {record.rectificationFeedback && (
+          <>
+            <Separator className="my-4" />
+            <div className="space-y-2">
+              <h4 className="text-sm font-medium text-[#1f2329]">整改反馈</h4>
+              <div className="rounded-lg bg-[#f5f6f8] p-3">
+                <p className="text-sm text-[#646a73] whitespace-pre-wrap">{record.rectificationFeedback}</p>
+              </div>
+            </div>
+          </>
+        )}
+
+        {/* 权限中心 */}
+        {(record.permAccountName || record.permStoreName || record.permWorkOrderId || record.permApplicant || record.permUserNickname || record.permUserRoleList || record.permApplicantEmail || record.permApplicantPhone) && (
+          <>
+            <Separator className="my-4" />
+            <div className="space-y-3">
+              <h4 className="text-sm font-medium text-[#1f2329] pb-1 border-b border-[#e5e6eb]">权限中心</h4>
+              <div className="grid grid-cols-2 gap-x-6 gap-y-3">
+                <FieldRow label="账号名称" value={record.permAccountName} />
+                <FieldRow label="店铺名称" value={record.permStoreName} />
+                <FieldRow label="工单ID" value={record.permWorkOrderId} />
+                <FieldRow label="申请人" value={record.permApplicant} />
+                <FieldRow label="用户昵称" value={record.permUserNickname} />
+                <FieldRow label="用户角色列表" value={record.permUserRoleList} />
+                <FieldRow label="CORP邮箱" value={record.permApplicantEmail} />
+                <FieldRow label="手机号" value={record.permApplicantPhone} />
+              </div>
+            </div>
+          </>
+        )}
+
+        {/* 外部系统 */}
+        {extFields.some((f) => f.value) && (
+          <>
+            <Separator className="my-4" />
+            <div className="space-y-3">
+              <h4 className="text-sm font-medium text-[#1f2329] pb-1 border-b border-[#e5e6eb]">外部系统</h4>
+              <div className="grid grid-cols-2 gap-x-6 gap-y-3">
+                {extFields.map((f) => (
+                  <FieldRow key={f.label} label={f.label} value={f.value} />
+                ))}
+              </div>
+            </div>
+          </>
+        )}
+
+        {/* 操作按钮 */}
+        {onAction && record && (record.status === '待处理' || record.status === '整改中') && (
+          <div className="pt-6 pb-4">
+            <Separator className="mb-4" />
+            {record.status === '待处理' && (
+              <Button
+                className="w-full bg-[#3370ff] hover:bg-[#2860e1]"
+                onClick={() => onAction('confirm', record)}
+              >
+                确认核查
+              </Button>
+            )}
+            {record.status === '整改中' && (
+              <Button
+                className="w-full bg-[#ff9500] hover:bg-[#e68600]"
+                onClick={() => onAction('feedback', record)}
+              >
+                整改反馈
+              </Button>
+            )}
+          </div>
+        )}
+
+        {/* 底部留白 */}
+        <div className="h-24" />
+          </>
+        )}
+      </SheetContent>
+    </Sheet>
+  )
+}
